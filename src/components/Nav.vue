@@ -1,4 +1,58 @@
 <script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStoreUsuarios } from '../stores/usuario.js';
+
+const router = useRouter();
+const useUsuario = useStoreUsuarios();
+const cedula = ref('');
+const contrasena = ref('');
+const loading = ref(false);
+const notificacionVisible = ref(false);
+const validacion = ref('');
+const mostrarModalLogin = ref(false);
+
+const login = async () => {
+    loading.value = true;
+    const data = {
+        cedula: cedula.value,
+        password: contrasena.value,
+    };
+
+    try {
+        const response = await useUsuario.login(data);
+
+        if (useUsuario.estatus === 200) {
+            console.log(response);
+            mostrarModalLogin.value = false;
+            limpiar();
+            irInicioAdmin();
+
+        } else if (useUsuario.estatus === 400 || useUsuario.estatus === 401 || useUsuario.estatus === 404 || useUsuario.estatus === 500) {
+            notificacionVisible.value = true;
+            validacion.value = 'Usuario o contraseña incorrectos';
+            setTimeout(() => {
+                notificacionVisible.value = false;
+            }, 4000);
+            return;
+        }
+    } catch (error) {
+        console.log(error);
+        notificacionVisible.value = true;
+        validacion.value = 'Usuario o contraseña incorrectos';
+        setTimeout(() => {
+            notificacionVisible.value = false;
+        }, 9000);
+        return;
+    } finally {
+        loading.value = false;
+    }
+};
+
+function limpiar() {
+    cedula.value = '';
+    contrasena.value = '';
+}
 
 </script>
 
@@ -301,6 +355,10 @@
             </div>
         </div>
 
+        <div v-if="notificacionVisible" class="custom-notify alert alert-success alert-dismissible fade show"
+            role="alert">
+            {{ validacion }}
+        </div>
     </div>
 </template>
 
@@ -417,4 +475,25 @@
     padding: 20px;
     font-size: 14px;
 }
+
+.custom-notify {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    width: 300px;
+    text-align: center;
+    padding: 15px;
+    background-color: #fa2424;
+    color: white;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+}
+
+.custom-notify .close:hover {
+    opacity: 1;
+}
+
 </style>
