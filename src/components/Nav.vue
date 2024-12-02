@@ -15,7 +15,7 @@ const mostrarModalLogin = ref(false);
 const login = async () => {
     loading.value = true;
     const data = {
-        cedula: cedula.value,
+        num_documento: cedula.value,
         password: contrasena.value,
     };
 
@@ -25,8 +25,11 @@ const login = async () => {
         if (useUsuario.estatus === 200) {
             console.log(response);
             mostrarModalLogin.value = false;
+            const modalElement = document.getElementById('IngresarUser');
+            const bsModal = bootstrap.Modal.getInstance(modalElement);
+            if (bsModal) bsModal.hide();
             limpiar();
-            irInicioAdmin();
+            Ingresar();
 
         } else if (useUsuario.estatus === 400 || useUsuario.estatus === 401 || useUsuario.estatus === 404 || useUsuario.estatus === 500) {
             notificacionVisible.value = true;
@@ -54,12 +57,40 @@ function limpiar() {
     contrasena.value = '';
 }
 
+function Ingresar() {
+    router.push('/inicio')
+}
+
+function irCrearUsuario() {
+    router.push('/crear-usuario')
+}
+
+function irTablaAdministrador() {
+    router.push('/tabla-administrador')
+}
+
+function irTablaCliente() {
+    router.push('/tabla-cliente')
+}
+
+function irActualizarDatos() {
+    router.push('/actualizar-datos')
+}
+
+function logOut() {
+    useUsuario.token = '';
+    useUsuario.usuario = '';
+    useUsuario.rol = '';
+    useUsuario.id = '';
+    router.push("/home")
+}
+
 </script>
 
 <template>
     <div class="app-container">
         <!-- Barra de navegación fija -->
-        <nav class="navbar fixed-top" style="background-color: #000000;">
+        <nav v-if="!useUsuario.token" class="navbar fixed-top" style="background-color: #000000;">
             <div class="container-fluid">
                 <a class="navbar-brand">
                     <img src="../assets/logo_2.png" alt="Logo" width="600" height="100"
@@ -72,13 +103,188 @@ function limpiar() {
             </div>
         </nav>
 
+        <nav v-if="useUsuario.rol === 'Cliente'" class="navbar fixed-top" style="background-color: #000000;">
+            <div class="container-fluid">
+                <!--Icono de navegación del menu-->
+                <button class="navbar-toggler" type="button" style="background-color: #f8601d;"
+                    data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <!--Letrero en marquesina-->
+                <div class="navbar-nav ms-auto">
+                    <marquee behavior="scroll" direction="left"
+                        style="color: #fdfefe; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-size: xx-large;">
+                        ¡Bienvenidos a nuestro crossfit! Trainers Col Socorro
+                    </marquee>
+                </div>
+                <!--Menu desplegable-->
+                <div class="offcanvas offcanvas-start" style="background-color: #000000; color: #fdfefe;" tabindex="-1"
+                    id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                    <!--Encabezado del menu-->
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title mx-auto" id="offcanvasNavbarLabel"><img src="../assets/logo_3.png"
+                                @click="Ingresar()" style="cursor: pointer;" data-bs-dismiss="offcanvas"
+                                aria-label="Close" alt="Trainerscol"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <!--Cuerpo del menu-->
+                    <div class="offcanvas-body">
+                        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page"
+                                    style="cursor: pointer; color: #fdfefe; font-weight: bold;"
+                                    @click="irActualizarDatos()">Actualizar
+                                    Datos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: #fdfefe; font-weight: bold;" href="#">Registrar
+                                    Reto</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: #fdfefe; font-weight: bold;" href="#">Encuesta</a>
+                            </li>
+                            <div style=" border: 1px solid #f8601d;"></div>
+                            <li class="nav-item">
+                                <span class="nav-link" style="color: #fdfefe; font-weight: bold;">Redes Sociales</span>
+                                <a style="color: #fdfefe; font-size: 30px;" href="https://www.facebook.com/Trainerscol/"
+                                    target="_blank"><i class="bi bi-facebook" style="color: #f8601d;"></i></a>
+                                <a style="color: #fdfefe; font-size: 30px;margin: 0 10px;"
+                                    href="https://www.instagram.com/trainerscolsoc?igshid=1tt2rd726w4dz"
+                                    target="_blank"><i class="bi bi-instagram" style="color: #f8601d;"></i></a>
+                                <a style="color: #fdfefe; font-size: 30px;"
+                                    href="https://www.youtube.com/channel/UCSlxXNEJxW1c1gtZ8Y-4QRA" target="_blank"><i
+                                        class="bi bi-youtube" style="color: #f8601d;"></i></a>
+                            </li>
+                            <li class="nav-item">
+                                <span class="nav-link" style="color: #fdfefe; font-weight: bold;">WhatSapp</span>
+                                <a style="color: #fdfefe; font-size: 30px; text-decoration: none;"
+                                    href="https://wa.me/3012756264" target="_blank" class="whatsapp-button"><i
+                                        class="bi bi-whatsapp" style="color: #f8601d;"></i></a>
+                            </li>
+                            <li class="nav-item">
+                                <span class="nav-link" style="color: #fdfefe; font-weight: bold;">Contáctenos</span>
+                                <p style="color: #fdfefe; font-size: 15px;"><i class="bi bi-telephone-fill"
+                                        style="color: #f8601d;"></i> 310 3660846</p>
+                                <p style="color: #fdfefe; font-size: 15px;"><i class="bi bi-envelope-at-fill"
+                                        style="color: #f8601d;"></i> trainerscolsoc@gmail.com</p>
+                            </li>
+                            <li class="nav-item">
+                                <span class="nav-link" style="color: #fdfefe; font-weight: bold;">Pagina Web</span>
+                                <a style="color: #fdfefe; font-size: 30px; text-decoration: none;"
+                                    href="https://trainerscol.com/" target="_blank"><i class="bi bi-globe"
+                                        style="color: #f8601d;"></i></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: #fdfefe; font-weight: bold; cursor: pointer;"
+                                    @click="logOut()">
+                                    <i class="bi bi-box-arrow-right" style="color: #f8601d;"></i> Cerrar Sesión
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <nav v-if="useUsuario.rol === 'Administrador'" class="navbar fixed-top" style="background-color: #000000;">
+            <div class="container-fluid">
+                <!--Icono de navegación del menu-->
+                <button class="navbar-toggler" type="button" style="background-color: #f8601d;"
+                    data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <!--Letrero en marquesina-->
+                <div class="navbar-nav ms-auto">
+                    <marquee behavior="scroll" direction="left"
+                        style="color: #fdfefe; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-size: xx-large;">
+                        ¡Bienvenidos a nuestro crossfit! Trainers Col Socorro
+                    </marquee>
+                </div>
+                <!--Menu desplegable-->
+                <div class="offcanvas offcanvas-start" style="background-color: #000000; color: #fdfefe;" tabindex="-1"
+                    id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                    <!--Encabezado del menu-->
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title mx-auto" id="offcanvasNavbarLabel"><img src="../assets/logo_3.png"
+                                data-bs-dismiss="offcanvas" aria-label="Close" @click="Ingresar()" alt="trainerscol">
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <!--Cuerpo del menu-->
+                    <div class="offcanvas-body">
+                        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link active dropdown-toggle" aria-current="page" data-bs-toggle="dropdown"
+                                    aria-expanded="false" style="color: #fdfefe; font-weight: bold;" href="#">Usuario
+                                    Administrador</a>
+                                <ul class="dropdown-menu" style="background-color: #000000;">
+                                    <li><a class="dropdown-item"
+                                            style="cursor: pointer; color: #c8cbcb; font-weight: bold"
+                                            @click="irCrearUsuario()">Crear Usuario</a></li>
+                                    <li><a class="dropdown-item"
+                                            style="cursor: pointer; color: #c8cbcb; font-weight: bold"
+                                            @click="irTablaAdministrador()">Gestión Usuario</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: #fdfefe; font-weight: bold;"
+                                    @click="irTablaCliente()">Gestor Cliente</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: #fdfefe; font-weight: bold;" href="#">Ver Encuesta</a>
+                            </li>
+                            <div style=" border: 1px solid #f8601d;"></div>
+                            <li class="nav-item gap-5">
+                                <span class="nav-link" style="color: #fdfefe; font-weight: bold;">Redes Sociales</span>
+                                <a style="color: #fdfefe; font-size: 30px;" href="https://www.facebook.com/Trainerscol/"
+                                    target="_blank"><i class="bi bi-facebook" style="color: #f8601d;"></i></a>
+                                <a style="color: #fdfefe; font-size: 30px; margin: 0 10px;"
+                                    href="https://www.instagram.com/trainerscolsoc?igshid=1tt2rd726w4dz"
+                                    target="_blank"><i class="bi bi-instagram" style="color: #f8601d;"></i></a>
+                                <a style="color: #fdfefe; font-size: 30px;"
+                                    href="https://www.youtube.com/channel/UCSlxXNEJxW1c1gtZ8Y-4QRA" target="_blank"><i
+                                        class="bi bi-youtube" style="color: #f8601d;"></i></a>
+                            </li>
+                            <li class="nav-item">
+                                <span class="nav-link" style="color: #fdfefe; font-weight: bold;">WhatSapp</span>
+                                <a style="color: #fdfefe; font-size: 30px; text-decoration: none;"
+                                    href="https://wa.me/3012756264" target="_blank" class="whatsapp-button"><i
+                                        class="bi bi-whatsapp" style="color: #f8601d;"></i></a>
+                            </li>
+                            <li class="nav-item">
+                                <span class="nav-link" style="color: #fdfefe; font-weight: bold;">Contáctenos</span>
+                                <p style="color: #fdfefe; font-size: 15px;"><i class="bi bi-telephone-fill"
+                                        style="color: #f8601d;"></i> 310 3660846</p>
+                                <p style="color: #fdfefe; font-size: 15px;"><i class="bi bi-envelope-at-fill"
+                                        style="color: #f8601d;"></i> trainerscolsoc@gmail.com</p>
+                            </li>
+                            <li class="nav-item">
+                                <span class="nav-link" style="color: #fdfefe; font-weight: bold;">Pagina Web</span>
+                                <a style="color: #fdfefe; font-size: 30px; text-decoration: none;"
+                                    href="https://trainerscol.com/" target="_blank"><i class="bi bi-globe"
+                                        style="color: #f8601d;"></i></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: #fdfefe; font-weight: bold; cursor: pointer;"
+                                    @click="logOut()">
+                                    <i class="bi bi-box-arrow-right" style="color: #f8601d;"></i> Cerrar Sesión
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
         <!-- Contenedor del contenido principal -->
         <main class="content">
             <router-view />
         </main>
 
         <!-- Footer -->
-        <footer class="footer">
+        <footer v-if="!useUsuario.token" class="footer">
             <div class="container p-3">
                 <form class="row">
                     <div class="col-lg-4 col-md-12 mb-0">
@@ -140,19 +346,22 @@ function limpiar() {
                     <div class="modal-header" style="background-color: #000000;">
                         <h4 class="modal-title fs-5" id="IngresoUser" style="color: #fdfefe; font-weight: bold;">Iniciar
                             Sesión</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="background-color: white;"></button>
                     </div>
                     <div class="modal-body" style="background-color: #8c8888;">
-                        <form>
+                        <form @submit.prevent="login">
                             <div class="form-group mb-3">
                                 <label for="nombreUsuario" class="form-label d-flex justify-content-start"
                                     style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Usuario:</label>
-                                <input type="number" class="form-control" id="nombreUsuario" maxlength="20" required>
+                                <input type="number" v-model="cedula" class="form-control" id="nombreUsuario"
+                                    maxlength="20" required>
                             </div>
                             <div class="form-group mb-3">
                                 <label for="Contraseña" class="form-label d-flex justify-content-start"
                                     style="color: #fdfefe; font-size: smaller; font-weight: bold;">Contraseña:</label>
-                                <input type="password" class="form-control" id="Contraseña" maxlength="20" required>
+                                <input type="password" v-model="contrasena" class="form-control" id="Contraseña"
+                                    maxlength="20" required>
                             </div>
                             <div>
                                 <a data-bs-toggle="modal" data-bs-target="#RegistraseUser"
@@ -165,12 +374,14 @@ function limpiar() {
                                     href="#">Recuperar
                                     Contraseña</a>
                             </div>
+
+                            <div class="modal-footer" style="background-color: #000000;">
+                                <button type="submit" class="btn"
+                                    style="background-color: #f8601d; color: #fdfefe; font-weight: bold;">Ingresar</button>
+                            </div>
                         </form>
                     </div>
-                    <div class="modal-footer" style="background-color: #000000;">
-                        <button type="submit" class="btn"
-                            style="background-color: #f8601d; color: #fdfefe; font-weight: bold;">Ingresar</button>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -182,7 +393,8 @@ function limpiar() {
                     <div class="modal-header" style="background-color: #000000;">
                         <h4 class="modal-title fs-5" id="IngresoUser" style="color: #fdfefe; font-weight: bold;">
                             Registrate</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="background-color: white;"></button>
                     </div>
                     <div class="modal-body" style="background-color: #8c8888;">
                         <form>
@@ -242,7 +454,8 @@ function limpiar() {
                             <div class="form-group mb-3">
                                 <label for="CodeVerificacion" class="form-label d-flex justify-content-start"
                                     style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Contraseña</label>
-                                <input type="password" class="form-control" id="CodeVerificacion" placeholder="Ingrese una contraseña" required>
+                                <input type="password" class="form-control" id="CodeVerificacion"
+                                    placeholder="Ingrese una contraseña" required>
                             </div>
                             <div class="form-group mb-3">
                                 <label for="CodeVerificacion" class="form-label d-flex justify-content-start"
@@ -277,7 +490,8 @@ function limpiar() {
                         <h4 class="modal-title fs-5" id="IngresoUser" style="color: #fdfefe; font-weight: bold;">Mensaje
                             de Registro
                         </h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="background-color: white;"></button>
                     </div>
                     <div class="modal-body" style="background-color: #8c8888; text-align: justify;">
                         <p style="color: #fdfefe; font-weight: bold;">Se ha registrado satisfactoriamente; al correo
@@ -300,7 +514,8 @@ function limpiar() {
                         <h4 class="modal-title fs-5" id="IngresoUser" style="color: #fdfefe; font-weight: bold;">
                             Recuperar
                             Contraseña</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="background-color: white;"></button>
                     </div>
                     <div class="modal-body" style="background-color: #8c8888;">
                         <form>
@@ -338,7 +553,8 @@ function limpiar() {
                         <h4 class="modal-title fs-5" id="IngresoUser" style="color: #fdfefe; font-weight: bold;">Mensaje
                             Recuperar
                             Contraseña</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="background-color: white;"></button>
                     </div>
                     <div class="modal-body" style="background-color: #8c8888; text-align: justify;">
                         <p style="color: #fdfefe; font-weight: bold;">Al correo registrado se envio información para
@@ -361,7 +577,6 @@ function limpiar() {
         </div>
     </div>
 </template>
-
 
 <style scoped>
 /* Estilo para los botones fijos */
@@ -495,5 +710,4 @@ function limpiar() {
 .custom-notify .close:hover {
     opacity: 1;
 }
-
 </style>

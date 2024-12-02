@@ -1,27 +1,60 @@
 <script setup>
+import { ref } from 'vue';
+import { useStoreUsuarios } from '../stores/usuario.js';
 
+const useUsuario = useStoreUsuarios();
 </script>
 
 <template>
-  <div style="width: 100%;">
-    <div class="content">
-      <img src="../assets/foto_1.jpg" alt="Trainers Col" class="img-fluid full-screen-img">
+    <div>
+        <div v-if="useUsuario.rol === 'Administrador'" class="body">
+            <div class="content">
+            </div>
+        </div>
+        <div>
+            <img src="../assets/foto_user.jpg" alt="Trainers Col" class="img-fluid full-screen-img">
+        </div>
+        <!-- Botones de redes sociales -->
+        <div class="social-buttons">
+            <a href="https://wa.me/3012756264" target="_blank" aria-label="whatsapp"><img src="../assets/whatsapp.png"
+                    alt="whatsapp"></a>
+            <a href="https://www.facebook.com/Trainerscol/" target="_blank" aria-label="Facebook"><img
+                    src="../assets/facebook.png" alt="facebook"></a>
+            <a href="https://www.instagram.com/trainerscolsoc?igshid=1tt2rd726w4dz" target="_blank"
+                aria-label="Instagram"><img src="../assets/instagram.png" alt=""></a>
+            <a href="https://www.youtube.com/channel/UCSlxXNEJxW1c1gtZ8Y-4QRA" target="_blank" aria-label="youtube"><img
+                    src="../assets/youtube.png" alt="youtube"></a>
+        </div>
     </div>
-    <!-- Botones de redes sociales -->
-    <div class="social-buttons">
-      <a href="https://wa.me/3012756264" target="_blank" aria-label="whatsapp"><img src="../assets/whatsapp.png"
-          alt="whatsapp"></a>
-      <a href="https://www.facebook.com/Trainerscol/" target="_blank" aria-label="Facebook"><img
-          src="../assets/facebook.png" alt="facebook"></a>
-      <a href="https://www.instagram.com/trainerscolsoc?igshid=1tt2rd726w4dz" target="_blank"
-        aria-label="Instagram"><img src="../assets/instagram.png" alt=""></a>
-      <a href="https://www.youtube.com/channel/UCSlxXNEJxW1c1gtZ8Y-4QRA" target="_blank" aria-label="youtube"><img
-          src="../assets/youtube.png" alt="youtube"></a>
-    </div>
-  </div>
 </template>
 
 <style scoped>
+.body {
+    background-image: url('../assets/logo_1.1.png');
+    background-size: cover;
+    /* Ajusta la imagen al contenedor sin distorsión */
+    background-position: center;
+    /* Centra la imagen */
+    background-repeat: no-repeat;
+    /* Evita que la imagen se repita */
+    background-color: #3d3b3b;
+    /* Color de fondo si la imagen no se carga */
+    min-height: 93.5vh;
+    /* Altura mínima de la vista */
+    display: flex;
+    align-items: center;
+    /* Alinea el contenido verticalmente */
+    justify-content: center;
+    /* Centra el contenido horizontalmente */
+}
+
+.content {
+    margin-top: 20px;
+    color: #ffffff;
+    /* Ejemplo de texto para que sea visible */
+    text-align: center;
+}
+
 /* Estilo para los botones fijos */
 .social-buttons {
   position: fixed;

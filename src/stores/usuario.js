@@ -11,6 +11,7 @@ export const useStoreUsuarios = defineStore(
     const validacion = ref("");
     const estatus = ref("");
     const token = ref("");
+    const rol = ref("");
     const usuario = ref("");
     const nombre = ref("");
     const email = ref("");
@@ -33,6 +34,18 @@ export const useStoreUsuarios = defineStore(
       } catch (error) {
         console.log(error);
         estatus.value = error.response.status;
+      }
+    };
+
+    const getById = async (id) => {
+      try {
+        const response = await axios.get(`${modelo}/${id}`);
+        estatus.value = response.status;
+        return response.data;
+      } catch (error) {
+        console.error("Error al obtener el usuario", error);
+        estatus.value = error.response?.status || 500;
+        validacion.value = error.response?.data?.error || "Error al obtener el registro";
       }
     };
 
@@ -86,6 +99,7 @@ export const useStoreUsuarios = defineStore(
         token.value = response.data.token;
         usuario.value = response.data.usuario;
         id.value = response.data.usuario._id;
+        rol.value = response.data.usuario.rol;
         estatus.value = response.status;
         return response;
       } catch (error) {
@@ -130,7 +144,7 @@ export const useStoreUsuarios = defineStore(
       try {
         insertarToken();
         const response = await axios.post(`${modelo}/registro`, data);
-        /* console.log(response); */
+         console.log(response); 
         estatus.value = response.status;
         return response.data;
       } catch (error) {
@@ -149,7 +163,7 @@ export const useStoreUsuarios = defineStore(
         ) {
           validacion.value = "Sin conexión, por favor intente recargar";
           console.log(validacion);
-          router.push("/login");
+          router.push("/home");
           return null;
         }
         return error.response.data;
@@ -180,6 +194,7 @@ export const useStoreUsuarios = defineStore(
 
     return {
       getAll,
+      getById,
       login,
       agregar,
       editar,
@@ -196,6 +211,7 @@ export const useStoreUsuarios = defineStore(
       estatus,
       correoRecuperar,
       codigoCorreo,
+      rol,
     };
   },
   {
