@@ -111,14 +111,15 @@ onMounted(() => {
                                         }}</span>
                                 </button>
                             </td>
-                            <td><button type="button" class="btn btn-outline-info"><a
-                                        @click="irInfoCliente(usuario)">Ver</a></button></td>
+                            <td><button type="button" class="btn btn-outline-info"
+                                    @click="irInfoCliente(usuario)"><a>Ver</a></button></td>
                             <td><button type="button" class="btn" style="background-color: #f8601d;"><input
                                         class="form-check-input" type="checkbox"></button></td>
                         </tr>
                     </tbody>
                 </table>
-                <button class="btn float-end" style="background-color: #f8601d; color: #fdfefe; font-weight: bold;">Exportar a Archivo</button>
+                <button class="btn float-end"
+                    style="background-color: #f8601d; color: #fdfefe; font-weight: bold;">Exportar a Archivo</button>
             </div>
         </div>
     </div>

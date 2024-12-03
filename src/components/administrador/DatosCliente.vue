@@ -12,6 +12,9 @@ const usePlieguesCutaneos = useStorePlieguesCutaneos();
 const useUsuario = useStoreUsuarios();
 const usuarioId = ref('');
 const data = ref([]);
+const dataDA = ref({ estatura: '', peso: '', idUsuario: useUsuario.id });
+const dataPC = ref({ biceps: '', triceps: '', escapula: '', abdomen: '', suprailiaco: '', pectoral: '', pierna: '', pantorrilla: '', idUsuario: useUsuario.id })
+const dataPM = ref({ pectoral: '', hombro: '', cuello: '', biceps_relajado: '', biceps_contraido: '', abdomen: '', cintura: '', cadera: '', muslo_mayor: '', pantorrilla: '', idUsuario: useUsuario.id })
 const loading = ref(false);
 const password = ref('');
 const notificacionCargando = ref(false);
@@ -21,18 +24,21 @@ const mensajeCargando = ref('');
 const mensajeValidacion = ref('');
 const mensajeNotificacion = ref('');
 const guardando = ref(false);
+const guardandoDA = ref(false);
+const guardandoPC = ref(false);
+const guardandoPM = ref(false);
 const route = useRoute();
 
 const guardarCambios = async () => {
     // Validar que no existan campos vacíos
-    if (!data.value.nombre || 
-        !data.value.apellido || 
-        !data.value.tipo_documento || 
-        !data.value.num_documento || 
-        !data.value.edad || 
-        !data.value.rol || 
-        !data.value.tipo_sexo || 
-        !data.value.correo || 
+    if (!data.value.nombre ||
+        !data.value.apellido ||
+        !data.value.tipo_documento ||
+        !data.value.num_documento ||
+        !data.value.edad ||
+        !data.value.rol ||
+        !data.value.tipo_sexo ||
+        !data.value.correo ||
         !data.value.telefono) {
         notificacionValidacion.value = true;
         mensajeValidacion.value = "No se pueden enviar campos vacíos";
@@ -93,35 +99,186 @@ const guardarCambios = async () => {
 };
 
 function validarContraseña() {
-  if (password.value.trim() && password.value.length < 8) {
-    mensajeValidacion.value = 'La contraseña debe tener al menos 8 caracteres';
-    notificacionValidacion.value = true;
-    return false;
-  }
-  if (password.value.trim() && !/\d/.test(password.value)) {
-    mensajeValidacion.value = 'La contraseña debe contener al menos un número';
-    notificacionValidacion.value = true;
-    return false;
-  }
-  if (password.value.trim() && !/[@#\/]/.test(password.value)) {
-    mensajeValidacion.value = 'La contraseña debe contener al menos un carácter especial (@, #, /)';
-    notificacionValidacion.value = true;
-    return false;
-  }
+    if (password.value.trim() && password.value.length < 8) {
+        mensajeValidacion.value = 'La contraseña debe tener al menos 8 caracteres';
+        notificacionValidacion.value = true;
+        return false;
+    }
+    if (password.value.trim() && !/\d/.test(password.value)) {
+        mensajeValidacion.value = 'La contraseña debe contener al menos un número';
+        notificacionValidacion.value = true;
+        return false;
+    }
+    if (password.value.trim() && !/[@#\/]/.test(password.value)) {
+        mensajeValidacion.value = 'La contraseña debe contener al menos un carácter especial (@, #, /)';
+        notificacionValidacion.value = true;
+        return false;
+    }
 
-  if (password.value.trim() && !/[A-Z]/.test(password.value)) {
-    mensajeValidacion.value = 'La contraseña debe contener al menos una letra mayúscula';
-    notificacionValidacion.value = true;
-    return false;
-  }
-  if (password.value.trim() && !/[a-z]/.test(password.value)) {
-    mensajeValidacion.value = 'La contraseña debe contener al menos una letra minúscula';
-    notificacionValidacion.value = true;
-    return false;
-  }
-  notificacionValidacion.value = false; // No hay errores
-  return true;
+    if (password.value.trim() && !/[A-Z]/.test(password.value)) {
+        mensajeValidacion.value = 'La contraseña debe contener al menos una letra mayúscula';
+        notificacionValidacion.value = true;
+        return false;
+    }
+    if (password.value.trim() && !/[a-z]/.test(password.value)) {
+        mensajeValidacion.value = 'La contraseña debe contener al menos una letra minúscula';
+        notificacionValidacion.value = true;
+        return false;
+    }
+    notificacionValidacion.value = false; // No hay errores
+    return true;
 }
+
+const guardarCambiosDatosAntropometricos = async () => {
+    // Validar que no existan campos vacíos
+    if (!dataDA.value.estatura ||
+        !dataDA.value.peso) {
+        notificacionValidacion.value = true;
+        mensajeValidacion.value = "No se pueden enviar campos vacíos";
+        setTimeout(() => {
+            notificacionValidacion.value = false;
+        }, 3000);
+        return;
+    }
+
+    console.log(dataDA.value)
+
+    // Mostrar notificación de carga
+    notificacionCargando.value = true;
+    mensajeCargando.value = 'Editando Datos Antropométricos...';
+    guardandoDA.value = true;
+
+    try {
+        // Realizar la edición del usuario
+        const response = await useDatosAntropometricos.crear(dataDA.value);
+
+        if (useDatosAntropometricos.estatus === 200) {
+            notificacionCargando.value = false;
+            mensajeCargando.value = '';
+            notificacionVisible.value = true;
+            mensajeNotificacion.value = 'Datos Antropométricos modificados con éxito';
+
+            setTimeout(() => {
+                notificacionVisible.value = false;
+                mensajeNotificacion.value = '';
+            }, 3000);
+        } else {
+            notificacionValidacion.value = true;
+            mensajeValidacion.value = useDatosAntropometricos.validacion;
+        }
+    } catch (error) {
+        notificacionValidacion.value = true;
+        mensajeValidacion.value = "Error al editar datos antropometricos.";
+        console.log(error);
+    } finally {
+        notificacionCargando.value = false;
+        guardandoDA.value = false;
+    }
+};
+
+const guardarCambiosPlieguesCutaneos = async () => {
+    // Validar que no existan campos vacíos
+    if (!dataPC.value.biceps ||
+        !dataPC.value.triceps ||
+        !dataPC.value.escapula ||
+        !dataPC.value.abdomen ||
+        !dataPC.value.suprailiaco ||
+        !dataPC.value.pectoral ||
+        !dataPC.value.pierna ||
+        !dataPC.value.pantorrilla) {
+        notificacionValidacion.value = true;
+        mensajeValidacion.value = "No se pueden enviar campos vacíos";
+        setTimeout(() => {
+            notificacionValidacion.value = false;
+        }, 3000);
+        return;
+    }
+
+    // Mostrar notificación de carga
+    notificacionCargando.value = true;
+    mensajeCargando.value = 'Editando Datos Pliegues Cutáneos...';
+    guardandoDA.value = true;
+
+    try {
+        // Realizar la edición del usuario
+        const response = await usePlieguesCutaneos.crear(dataPC.value);
+
+        if (usePlieguesCutaneos.estatus === 200) {
+            notificacionCargando.value = false;
+            mensajeCargando.value = '';
+            notificacionVisible.value = true;
+            mensajeNotificacion.value = 'Datos Pliegues Cutáneos modificados con éxito';
+
+            setTimeout(() => {
+                notificacionVisible.value = false;
+                mensajeNotificacion.value = '';
+            }, 3000);
+        } else {
+            notificacionValidacion.value = true;
+            mensajeValidacion.value = usePlieguesCutaneos.validacion;
+        }
+    } catch (error) {
+        notificacionValidacion.value = true;
+        mensajeValidacion.value = "Error al editar datos pliegues cutáneos.";
+        console.log(error);
+    } finally {
+        notificacionCargando.value = false;
+        guardandoDA.value = false;
+    }
+};
+
+const guardarCambiosPerimetrosMusculares = async () => {
+    // Validar que no existan campos vacíos
+    if (!dataPM.value.pectoral ||
+        !dataPM.value.hombro ||
+        !dataPM.value.cuello ||
+        !dataPM.value.biceps_relajado ||
+        !dataPM.value.biceps_contraido ||
+        !dataPM.value.abdomen ||
+        !dataPM.value.cintura ||
+        !dataPM.value.cadera ||
+        !dataPM.value.muslo_mayor ||
+        !dataPM.value.pantorrilla) {
+        notificacionValidacion.value = true;
+        mensajeValidacion.value = "No se pueden enviar campos vacíos";
+        setTimeout(() => {
+            notificacionValidacion.value = false;
+        }, 3000);
+        return;
+    }
+
+    // Mostrar notificación de carga
+    notificacionCargando.value = true;
+    mensajeCargando.value = 'Editando Datos Perimetros Musculares...';
+    guardandoPM.value = true;
+
+    try {
+        // Realizar la edición del usuario
+        const response = await usePerimetrosMusculares.crear(dataPM.value);
+
+        if (usePerimetrosMusculares.estatus === 200) {
+            notificacionCargando.value = false;
+            mensajeCargando.value = '';
+            notificacionVisible.value = true;
+            mensajeNotificacion.value = 'Datos Perimetros Musculares modificados con éxito';
+
+            setTimeout(() => {
+                notificacionVisible.value = false;
+                mensajeNotificacion.value = '';
+            }, 3000);
+        } else {
+            notificacionValidacion.value = true;
+            mensajeValidacion.value = usePerimetrosMusculares.validacion;
+        }
+    } catch (error) {
+        notificacionValidacion.value = true;
+        mensajeValidacion.value = "Error al editar datos perimetros musculares.";
+        console.log(error);
+    } finally {
+        notificacionCargando.value = false;
+        guardandoPM.value = false;
+    }
+};
 
 
 async function getUsuarioById(id) {
@@ -139,19 +296,58 @@ async function getUsuarioById(id) {
     }
 }
 
+async function getDatoAntropometrico() {
+    try {
+        const response = await useDatosAntropometricos.getByIdUsuario(useUsuario.id);
+        if (useDatosAntropometricos.estatus === 200 && response.length > 0) {
+            dataDA.value = response[0];
+            console.log("dato antropome", response)
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function getPliegueCutaneo() {
+    try {
+        const response = await usePlieguesCutaneos.getByIdUsuario(useUsuario.id);
+        if (usePlieguesCutaneos.estatus === 200 && response.length > 0) {
+            dataPC.value = response[0];
+            console.log("pliegue cutaneo", response)
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function getPerimetroMuscular() {
+    try {
+        const response = await usePerimetrosMusculares.getByIdUsuario(useUsuario.id);
+        if (usePerimetrosMusculares.estatus === 200 && response.length > 0) {
+            dataPM.value = response[0];
+            console.log("perimetro muscular", response)
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 onMounted(async () => {
     const id = route.query.id;
     if (id) {
         usuarioId.value = id;
         await getUsuarioById(id);;
     }
+
+    getDatoAntropometrico();
+    getPliegueCutaneo();
+    getPerimetroMuscular()
 })
 
 </script>
 
 <template>
-    <div
-        style="background-color: #8c8888; min-height: 93.5vh; box-sizing: border-box; padding-top: 3rem; width: 100%;">
+    <div style="background-color: #8c8888; min-height: 93.5vh; box-sizing: border-box; padding-top: 3rem; width: 100%;">
         <div class="container"
             style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
             <!--Formulario de los datos del deportista-->
@@ -254,123 +450,138 @@ onMounted(async () => {
                 <div class="mt-2 mb-4">
                     <h4 style="font-weight: bold; color: #fdfefe;">Datos Parte del Cuerpo</h4>
                 </div>
-                <form id="formularioUserDato2">
-                    <h5 class="mb-3" style="font-weight: bold; color: #000000;">Datos Antropometricos</h5>
+                <form id="formularioUserDato2" @submit.prevent="guardarCambiosDatosAntropometricos">
+                    <h5 class="mb-3" style="font-weight: bold; color: #000000;">Datos Antropométricos</h5>
                     <div class="form-group mb-3">
                         <label for="EstaturaUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Estatura (cm):</label>
-                        <input type="number" class="form-control" id="EstaturaUser">
+                        <input type="number" v-model="dataDA.estatura" class="form-control" id="EstaturaUser" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="PesoUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Peso (kg):</label>
-                        <input type="number" class="form-control" id="PesoUser">
+                        <input type="number" v-model="dataDA.peso" class="form-control" id="PesoUser" required>
                     </div>
-                    <button type="submit" class="btn mb-5"
-                        style="background-color: #f8601d; color: #fdfefe; border-radius: 4px; font-weight: bold;">Actualizar</button>
+                    <button type="sumbit" class="btn mb-5" :disabled="guardandoDA"
+                        style="background-color: #f8601d; color: #fdfefe; border-radius: 4px; font-weight: bold;">
+                        <span v-if="guardandoDA" class="spinner-border spinner-border-sm" role="status"
+                            aria-hidden="true"></span>
+                        <span v-if="!guardandoDA">Actualizar</span></button>
                 </form>
-                <form id="formularioUserDato3">
-
-                    <h5 class="mt-1 mb-3" style="font-weight: bold; color: #000000;">Pliegues Cutaneos</h5>
+                <form id="formularioUserDato2" @submit.prevent="guardarCambiosPlieguesCutaneos">
+                    <h5 class="mt-1 mb-3" style="font-weight: bold; color: #000000;">Pliegues Cutáneos</h5>
                     <div class="form-group mb-3">
                         <label for="BicepsUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Biceps:</label>
-                        <input type="number" class="form-control" id="BicepsUser">
+                        <input type="number" v-model="dataPC.biceps" class="form-control" id="BicepsUser" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="TricepsUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Triceps:</label>
-                        <input type="number" class="form-control" id="TricepsUser">
+                        <input type="number" v-model="dataPC.triceps" class="form-control" id="TricepsUser" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="EscapulaUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Escapula:</label>
-                        <input type="number" class="form-control" id="EscapulaUser">
+                        <input type="number" v-model="dataPC.escapula" class="form-control" id="EscapulaUser" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="AbdomenUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Abdomen:</label>
-                        <input type="number" class="form-control" id="AbdomenUser">
+                        <input type="number" v-model="dataPC.abdomen" class="form-control" id="AbdomenUser" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="suprailiacoUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Suprailiaco:</label>
-                        <input type="number" class="form-control" id="suprailiacoUser">
+                        <input type="number" v-model="dataPC.suprailiaco" class="form-control" id="suprailiacoUser"
+                            required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="PectoralUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Pectoral:</label>
-                        <input type="number" class="form-control" id="PectoralUser">
+                        <input type="number" v-model="dataPC.pectoral" class="form-control" id="PectoralUser" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="PiernaUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Pierna:</label>
-                        <input type="number" class="form-control" id="PiernaUser">
+                        <input type="number" v-model="dataPC.pierna" class="form-control" id="PiernaUser" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="PantorrillaUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Pantorrilla:</label>
-                        <input type="number" class="form-control" id="PantorrillaUser">
+                        <input type="number" v-model="dataPC.pantorrilla" class="form-control" id="PantorrillaUser"
+                            required>
                     </div>
-                    <button type="submit" class="btn mb-5"
-                        style="background-color: #f8601d; color: #fdfefe; border-radius: 4px; font-weight: bold;">Actualizar</button>
+
+                    <button type="sumbit" class="btn mb-5" :disabled="guardandoPC"
+                        style="background-color: #f8601d; color: #fdfefe; border-radius: 4px; font-weight: bold;">
+                        <span v-if="guardandoPC" class="spinner-border spinner-border-sm" role="status"
+                            aria-hidden="true"></span>
+                        <span v-if="!guardandoPC">Actualizar</span></button>
                 </form>
                 <!--Formulario parte II-->
-                <form id="formularioUserDato4">
+                <form id="formularioUserDato3" @submit.prevent="guardarCambiosPerimetrosMusculares">
                     <h5 class="mt-1 mb-3" style="font-weight: bold; color: #000000;">Perimetros Musculares</h5>
                     <div class="form-group mb-3">
                         <label for="PectoralUser2" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Pectoral:</label>
-                        <input type="number" class="form-control" id="PectoralUser2">
+                        <input type="number" v-model="dataPM.pectoral" class="form-control" id="PectoralUser2" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="HombroUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Hombro:</label>
-                        <input type="number" class="form-control" id="HombroUser">
+                        <input type="number" v-model="dataPM.hombro" class="form-control" id="HombroUser" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="CuelloUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Cuello:</label>
-                        <input type="number" class="form-control" id="CuelloUser">
+                        <input type="number" v-model="dataPM.cuello" class="form-control" id="CuelloUser" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="BicepsRelajadoUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Biceps Relajado:</label>
-                        <input type="number" class="form-control" id="BicepsRelajadoUser">
+                        <input type="number" v-model="dataPM.biceps_relajado" class="form-control"
+                            id="BicepsRelajadoUser" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="BicepsContraidoUser" class="form-label d-flex justify-content-start"
-                            style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Biceps Contraido:</label>
-                        <input type="number" class="form-control" id="BicepsContraidoUser">
+                            style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Biceps
+                            Contraido:</label>
+                        <input type="number" v-model="dataPM.biceps_contraido" class="form-control"
+                            id="BicepsContraidoUser" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="AbdomenUser2" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Abdomen:</label>
-                        <input type="number" class="form-control" id="AbdomenUser2">
+                        <input type="number" v-model="dataPM.abdomen" class="form-control" id="AbdomenUser2" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="CinturaUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Cintura:</label>
-                        <input type="number" class="form-control" id="CinturaUser">
+                        <input type="number" v-model="dataPM.cintura" class="form-control" id="CinturaUser" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="CaderaUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Cadera:</label>
-                        <input type="number" class="form-control" id="caderaUser">
+                        <input type="number" v-model="dataPM.cadera" class="form-control" id="caderaUser" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="MusloMayorUser" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Muslo Mayor:</label>
-                        <input type="number" class="form-control" id="MusloMayorUser">
+                        <input type="number" v-model="dataPM.muslo_mayor" class="form-control" id="MusloMayorUser"
+                            required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="PantorrillaUser2" class="form-label d-flex justify-content-start"
                             style="color: #fdfefe; font-size: smaller; font-weight: bold; ">Pantorrilla:</label>
-                        <input type="number" class="form-control" id="PantorrillaUser2">
+                        <input type="number" v-model="dataPM.pantorrilla" class="form-control" id="PantorrillaUser2"
+                            required>
                     </div>
-
-                    <button type="submit" class="btn mb-4"
-                        style="background-color: #f8601d; color: #fdfefe; border-radius: 4px; font-weight: bold;">Actualizar</button>
+                    <button type="sumbit" class="btn mb-3" :disabled="guardandoPM"
+                        style="background-color: #f8601d; color: #fdfefe; border-radius: 4px; font-weight: bold;">
+                        <span v-if="guardandoPM" class="spinner-border spinner-border-sm" role="status"
+                            aria-hidden="true"></span>
+                        <span v-if="!guardandoPM">Actualizar</span></button>
                 </form>
             </div>
         </div>
