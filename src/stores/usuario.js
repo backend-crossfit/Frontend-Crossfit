@@ -49,6 +49,19 @@ export const useStoreUsuarios = defineStore(
       }
     };
 
+    const getDatosCliente = async (idUsuario) => {
+      try {
+        insertarToken();
+        const response = await axios.get(`${modelo}/datos-usuario/${idUsuario}`);
+        /* console.log(response); */
+        estatus.value = response.status;
+        return response.data;
+      } catch (error) {
+        console.log(error);
+        estatus.value = error.response.status;
+      }
+    };
+
     const codigoRecuperar = async (correo) => {
       try {
         const response = await axios.get(
@@ -195,6 +208,7 @@ export const useStoreUsuarios = defineStore(
     return {
       getAll,
       getById,
+      getDatosCliente,
       login,
       agregar,
       editar,

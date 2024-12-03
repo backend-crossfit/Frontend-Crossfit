@@ -12,9 +12,9 @@ const usePlieguesCutaneos = useStorePlieguesCutaneos();
 const useUsuario = useStoreUsuarios();
 const usuarioId = ref('');
 const data = ref([]);
-const dataDA = ref({ estatura: '', peso: '', idUsuario: useUsuario.id });
-const dataPC = ref({ biceps: '', triceps: '', escapula: '', abdomen: '', suprailiaco: '', pectoral: '', pierna: '', pantorrilla: '', idUsuario: useUsuario.id })
-const dataPM = ref({ pectoral: '', hombro: '', cuello: '', biceps_relajado: '', biceps_contraido: '', abdomen: '', cintura: '', cadera: '', muslo_mayor: '', pantorrilla: '', idUsuario: useUsuario.id })
+const dataDA = ref({ estatura: '', peso: '', idUsuario: usuarioId });
+const dataPC = ref({ biceps: '', triceps: '', escapula: '', abdomen: '', suprailiaco: '', pectoral: '', pierna: '', pantorrilla: '', idUsuario: usuarioId })
+const dataPM = ref({ pectoral: '', hombro: '', cuello: '', biceps_relajado: '', biceps_contraido: '', abdomen: '', cintura: '', cadera: '', muslo_mayor: '', pantorrilla: '', idUsuario: usuarioId })
 const loading = ref(false);
 const password = ref('');
 const notificacionCargando = ref(false);
@@ -296,9 +296,9 @@ async function getUsuarioById(id) {
     }
 }
 
-async function getDatoAntropometrico() {
+async function getDatoAntropometrico(id) {
     try {
-        const response = await useDatosAntropometricos.getByIdUsuario(useUsuario.id);
+        const response = await useDatosAntropometricos.getByIdUsuario(id);
         if (useDatosAntropometricos.estatus === 200 && response.length > 0) {
             dataDA.value = response[0];
             console.log("dato antropome", response)
@@ -308,9 +308,9 @@ async function getDatoAntropometrico() {
     }
 }
 
-async function getPliegueCutaneo() {
+async function getPliegueCutaneo(id) {
     try {
-        const response = await usePlieguesCutaneos.getByIdUsuario(useUsuario.id);
+        const response = await usePlieguesCutaneos.getByIdUsuario(id);
         if (usePlieguesCutaneos.estatus === 200 && response.length > 0) {
             dataPC.value = response[0];
             console.log("pliegue cutaneo", response)
@@ -320,9 +320,9 @@ async function getPliegueCutaneo() {
     }
 }
 
-async function getPerimetroMuscular() {
+async function getPerimetroMuscular(id) {
     try {
-        const response = await usePerimetrosMusculares.getByIdUsuario(useUsuario.id);
+        const response = await usePerimetrosMusculares.getByIdUsuario(id);
         if (usePerimetrosMusculares.estatus === 200 && response.length > 0) {
             dataPM.value = response[0];
             console.log("perimetro muscular", response)
@@ -336,12 +336,13 @@ onMounted(async () => {
     const id = route.query.id;
     if (id) {
         usuarioId.value = id;
-        await getUsuarioById(id);;
+        await getUsuarioById(id);
+        await getDatoAntropometrico(id);
+        await getPliegueCutaneo(id);
+        await getPerimetroMuscular(id)
     }
 
-    getDatoAntropometrico();
-    getPliegueCutaneo();
-    getPerimetroMuscular()
+
 })
 
 </script>
