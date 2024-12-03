@@ -73,7 +73,8 @@ onMounted(() => {
 </script>
 
 <template>
-    <div style="background-color: #8c8888; min-height: 93.5vh; box-sizing: border-box; padding-top: 3rem; width: 100vw;">
+    <div
+        style="background-color: #8c8888; min-height: 93.5vh; box-sizing: border-box; padding-top: 3rem; width: 100vw;">
         <div class="container">
             <p class="fs-2" style="color: #fdfefe; font-weight: bold; text-align: center;">Gestor de Usuarios
                 Administradores</p>
@@ -109,8 +110,8 @@ onMounted(() => {
                                         }}</span>
                                 </button>
                             </td>
-                            <td><button type="button" class="btn btn-outline-info"><a
-                                        @click="irEditarAdmin(usuario)">Editar</a></button></td>
+                            <td><button type="button" class="btn btn-outline-info"
+                                    @click="irEditarAdmin(usuario)">Editar</button></td>
                         </tr>
                     </tbody>
                 </table>

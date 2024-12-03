@@ -92,8 +92,6 @@ const guardarCambios = async () => {
     }
 };
 
-
-
 function validarContraseña() {
   if (password.value.trim() && password.value.length < 8) {
     mensajeValidacion.value = 'La contraseña debe tener al menos 8 caracteres';

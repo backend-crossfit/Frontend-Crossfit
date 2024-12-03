@@ -40,6 +40,18 @@ export const useStoreDatosAntropometricos = defineStore(
       }
     };
 
+    const getByIdUsuario = async (id) => {
+      try {
+        const response = await axios.get(`${modelo}/por-usuario/${id}`);
+        estatus.value = response.status;
+        return response.data;
+      } catch (error) {
+        console.error("Error al obtener datos antropométricos por ID:", error);
+        estatus.value = error.response?.status || 500;
+        validacion.value = error.response?.data?.error || "Error al obtener los datos";
+      }
+    };
+
     // Crear un nuevo registro de datos antropométricos
     const crear = async (data) => {
       try {
@@ -99,6 +111,7 @@ export const useStoreDatosAntropometricos = defineStore(
       validacion,
       getAll,
       getById,
+      getByIdUsuario,
       crear,
       editar,
       inactivar,

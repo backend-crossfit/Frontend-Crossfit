@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStoreUsuarios } from '../stores/usuario.js';
 
@@ -85,6 +85,8 @@ function logOut() {
     router.push("/home")
 }
 
+
+
 </script>
 
 <template>
@@ -138,11 +140,11 @@ function logOut() {
                                     Datos</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" style="color: #fdfefe; font-weight: bold;" href="#">Registrar
+                                <a class="nav-link" style="cursor: pointer; color: #fdfefe; font-weight: bold;">Registrar
                                     Reto</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" style="color: #fdfefe; font-weight: bold;" href="#">Encuesta</a>
+                                <a class="nav-link" style="cursor: pointer; color: #fdfefe; font-weight: bold;">Encuesta</a>
                             </li>
                             <div style=" border: 1px solid #f8601d;"></div>
                             <li class="nav-item">
@@ -229,11 +231,11 @@ function logOut() {
                                 </ul>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" style="color: #fdfefe; font-weight: bold;"
+                                <a class="nav-link" style="cursor: pointer; color: #fdfefe; font-weight: bold;"
                                     @click="irTablaCliente()">Gestor Cliente</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" style="color: #fdfefe; font-weight: bold;" href="#">Ver Encuesta</a>
+                                <a class="nav-link" style="cursor: pointer; color: #fdfefe; font-weight: bold;">Ver Encuesta</a>
                             </li>
                             <div style=" border: 1px solid #f8601d;"></div>
                             <li class="nav-item gap-5">
