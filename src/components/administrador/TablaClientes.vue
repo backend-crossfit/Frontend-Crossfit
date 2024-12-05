@@ -14,64 +14,67 @@ const notificacionValidacion = ref(false);
 const mensajeValidacion = ref('');
 
 // Función para exportar los datos seleccionados
-// Función para exportar datos a Excel
-// Función para exportar datos a Excel
 function exportarAExcel() {
-  if (datosCliente.value.length === 0) {
-    alert("No hay datos seleccionados para exportar.");
-    return;
-  }
+    if (datosCliente.value.length === 0) {
+        notificacionValidacion.value = true;
+        mensajeValidacion.value = 'Por favor seleccione un dato para exportar';
+        setTimeout(() => {
+            notificacionValidacion.value = false;
+            mensajeValidacion.value = '';
+        }, 3000);
+        return;
+    }
 
-  // Crear las hojas para cada tabla
-  const hojaAntropometricos = datosCliente.value.map((cliente) => {
-    const { datos, usuario } = cliente;
-    return {
-      Usuario: `${usuario.nombre} ${usuario.apellido}`,
-      Documento: usuario.num_documento,
-      Estatura: datos.antropometricos?.estatura || "N/A",
-      Peso: datos.antropometricos?.peso || "N/A",
-    };
-  });
+    // Crear las hojas para cada tabla
+    const hojaAntropometricos = datosCliente.value.map((cliente) => {
+        const { datos, usuario } = cliente;
+        return {
+            Usuario: `${usuario.nombre} ${usuario.apellido}`,
+            Documento: usuario.num_documento,
+            Estatura: datos.antropometricos?.estatura || "N/A",
+            Peso: datos.antropometricos?.peso || "N/A",
+        };
+    });
 
-  const hojaPerimetros = datosCliente.value.map((cliente) => {
-    const { datos, usuario } = cliente;
-    return {
-      Usuario: `${usuario.nombre} ${usuario.apellido}`,
-      Documento: usuario.num_documento,
-      Abdomen: datos.perimetrosMusculares?.abdomen || "N/A",
-      Bíceps_Contraído: datos.perimetrosMusculares?.biceps_contraido || "N/A",
-      Bíceps_Relajado: datos.perimetrosMusculares?.biceps_relajado || "N/A",
-      Cintura: datos.perimetrosMusculares?.cintura || "N/A",
-      Cadera: datos.perimetrosMusculares?.cadera || "N/A",
-    };
-  });
+    const hojaPerimetros = datosCliente.value.map((cliente) => {
+        const { datos, usuario } = cliente;
+        return {
+            Usuario: `${usuario.nombre} ${usuario.apellido}`,
+            Documento: usuario.num_documento,
+            Abdomen: datos.perimetrosMusculares?.abdomen || "N/A",
+            Bíceps_Contraído: datos.perimetrosMusculares?.biceps_contraido || "N/A",
+            Bíceps_Relajado: datos.perimetrosMusculares?.biceps_relajado || "N/A",
+            Cintura: datos.perimetrosMusculares?.cintura || "N/A",
+            Cadera: datos.perimetrosMusculares?.cadera || "N/A",
+        };
+    });
 
-  const hojaPliegues = datosCliente.value.map((cliente) => {
-    const { datos, usuario } = cliente;
-    return {
-      Usuario: `${usuario.nombre} ${usuario.apellido}`,
-      Documento: usuario.num_documento,
-      Abdomen: datos.plieguesCutaneos?.abdomen || "N/A",
-      Bíceps: datos.plieguesCutaneos?.biceps || "N/A",
-      Tríceps: datos.plieguesCutaneos?.triceps || "N/A",
-      Escápula: datos.plieguesCutaneos?.escapula || "N/A",
-      Suprailiaco: datos.plieguesCutaneos?.suprailiaco || "N/A",
-    };
-  });
+    const hojaPliegues = datosCliente.value.map((cliente) => {
+        const { datos, usuario } = cliente;
+        return {
+            Usuario: `${usuario.nombre} ${usuario.apellido}`,
+            Documento: usuario.num_documento,
+            Abdomen: datos.plieguesCutaneos?.abdomen || "N/A",
+            Bíceps: datos.plieguesCutaneos?.biceps || "N/A",
+            Tríceps: datos.plieguesCutaneos?.triceps || "N/A",
+            Escápula: datos.plieguesCutaneos?.escapula || "N/A",
+            Suprailiaco: datos.plieguesCutaneos?.suprailiaco || "N/A",
+        };
+    });
 
-  // Crear el libro de trabajo
-  const workbook = XLSX.utils.book_new();
-  const worksheetAntropometricos = XLSX.utils.json_to_sheet(hojaAntropometricos);
-  const worksheetPerimetros = XLSX.utils.json_to_sheet(hojaPerimetros);
-  const worksheetPliegues = XLSX.utils.json_to_sheet(hojaPliegues);
+    // Crear el libro de trabajo
+    const workbook = XLSX.utils.book_new();
+    const worksheetAntropometricos = XLSX.utils.json_to_sheet(hojaAntropometricos);
+    const worksheetPerimetros = XLSX.utils.json_to_sheet(hojaPerimetros);
+    const worksheetPliegues = XLSX.utils.json_to_sheet(hojaPliegues);
 
-  // Agregar las hojas al libro
-  XLSX.utils.book_append_sheet(workbook, worksheetAntropometricos, "Antropométricos");
-  XLSX.utils.book_append_sheet(workbook, worksheetPerimetros, "Perímetros Musculares");
-  XLSX.utils.book_append_sheet(workbook, worksheetPliegues, "Pliegues Cutáneos");
+    // Agregar las hojas al libro
+    XLSX.utils.book_append_sheet(workbook, worksheetAntropometricos, "Antropométricos");
+    XLSX.utils.book_append_sheet(workbook, worksheetPerimetros, "Perímetros Musculares");
+    XLSX.utils.book_append_sheet(workbook, worksheetPliegues, "Pliegues Cutáneos");
 
-  // Exportar como archivo Excel
-  XLSX.writeFile(workbook, "Datos_Clientes_Completos.xlsx");
+    // Exportar como archivo Excel
+    XLSX.writeFile(workbook, "Datos_Clientes_Completos.xlsx");
 }
 
 async function cambiarEstadoAdmin(usuario) {
@@ -117,19 +120,30 @@ async function getUsuario() {
 }
 
 async function getDatosCliente(id) {
-    loadingDatos.value = true;
+    loadingDatos.value = true; // Mostrar el indicador de carga mientras se procesa
     try {
-        const response = await useUsuario.getDatosCliente(id);
-        if (useUsuario.estatus === 200) {
-            datosCliente.value.push(response);
-            console.log(datosCliente)
+        // Verificar si el cliente ya está en el array
+        const clienteIndex = datosCliente.value.findIndex(cliente => cliente.usuario._id === id);
+
+        if (clienteIndex !== -1) {
+            // Si el cliente ya está en el array, eliminarlo
+            datosCliente.value.splice(clienteIndex, 1);
+        } else {
+            // Si no está en el array, agregarlo
+            const response = await useUsuario.getDatosCliente(id);
+            if (useUsuario.estatus === 200) {
+                datosCliente.value.push(response);
+                console.log(datosCliente);
+            }
         }
     } catch (error) {
-        console.log(error);
-    } finally{
-        loadingDatos.value = false;
+        console.error("Error al obtener los datos del cliente:", error);
+    } finally {
+        loadingDatos.value = false; // Ocultar el indicador de carga
     }
 }
+
+
 
 const filtrarUsuarios = computed(() => {
     return usuarios.value.reverse().filter(usuario => {
@@ -194,16 +208,26 @@ onMounted(() => {
                             </td>
                             <td><button type="button" class="btn btn-outline-info"
                                     @click="irInfoCliente(usuario)"><a>Ver</a></button></td>
-                            <td><button type="button" class="btn" style="background-color: #f8601d;"><input
-                                        class="form-check-input" type="checkbox"
-                                        @click="getDatosCliente(usuario._id)"></button></td>
+                            <td>
+                                <button type="button" class="btn" style="background-color: #f8601d;">
+                                    <input class="form-check-input" type="checkbox"
+                                        :checked="datosCliente.some(cliente => cliente.usuario._id === usuario._id)"
+                                        @click="getDatosCliente(usuario._id)">
+                                </button>
+                            </td>
+
+
                         </tr>
                     </tbody>
                 </table>
                 <button type="button" class="btn float-end"
-                    style="background-color: #f8601d; color: #fdfefe; font-weight: bold;"
-                    @click="exportarAExcel" :disabled="loadingDatos">Exportar a Archivo</button>
+                    style="background-color: #f8601d; color: #fdfefe; font-weight: bold;" @click="exportarAExcel"
+                    :disabled="loadingDatos">Exportar a Archivo</button>
             </div>
+        </div>
+        <div v-if="notificacionValidacion" class="custom-notify alert alert-danger alert-dismissible fade show"
+            role="alert">
+            {{ mensajeValidacion }}
         </div>
     </div>
 </template>

@@ -1,9 +1,12 @@
 <script setup>
+import { useStoreUsuarios } from '../stores/usuario';
+
+const useUsuario = useStoreUsuarios();
 
 </script>
 
 <template>
-  <div style="width: 100%;">
+  <div v-if="!  useUsuario.token" style="width: 100%;">
     <div class="content">
       <img src="../assets/foto_1.jpg" alt="Trainers Col" class="img-fluid full-screen-img">
     </div>

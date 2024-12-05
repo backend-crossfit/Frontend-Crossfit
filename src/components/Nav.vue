@@ -726,8 +726,11 @@ function home() {
                             </div>
 
                             <div class="modal-footer" style="background-color: #000000;">
-                                <button type="submit" class="btn"
-                                    style="background-color: #f8601d; color: #fdfefe; font-weight: bold;">Ingresar</button>
+                                <button type="submit" class="btn" :disabled="loading"
+                                    style="background-color: #f8601d; color: #fdfefe; font-weight: bold;"><span
+                                        v-if="loading" class="spinner-border spinner-border-sm" role="status"
+                                        aria-hidden="true"></span>
+                                    <span v-if="!loading">Ingresar</span></button>
                             </div>
                         </form>
                     </div>
