@@ -7,7 +7,7 @@ import App from "./App.vue";
 import FloatingVue from 'floating-vue'
 import 'floating-vue/dist/style.css'
 
-axios.defaults.baseURL = 'http://localhost:4500/api/'
+axios.defaults.baseURL = 'https://backend-crossfit.onrender.com/api/'
 
 
 const pinia = createPinia();
